@@ -8,13 +8,8 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  const firstProductId = 1;
-  await prisma.product.upsert({
-    where: {
-      id: firstProductId,
-    },
-    create: {
-      id: firstProductId,
+  await prisma.product.create({
+    data: {
       title: 'some title',
       description: 'some desc',
       picture:
@@ -22,7 +17,6 @@ async function main() {
       price: 10.5,
       quantity: 10,
     },
-    update: {},
   });
 }
 
