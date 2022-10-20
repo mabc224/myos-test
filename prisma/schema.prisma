@@ -15,7 +15,7 @@ model Product {
   title String  @db.VarChar(255)
   description String? @db.Text
   picture String?
-  price Int
+  price Float
   quantity Int @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
