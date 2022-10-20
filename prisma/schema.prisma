@@ -11,12 +11,52 @@ datasource db {
 }
 
 model Product {
-  id    Int     @default(autoincrement()) @id
-  title String  @db.VarChar(255)
-  description String? @db.Text
-  picture String?
-  price Float
-  quantity Int @default(0)
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  description String?  @db.Text
+  picture     String?
+  price       Float
+  isDeleted   Boolean  @default(false)
+  quantity    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Cart        Cart[]
+  @@unique([id, isDeleted])
+}
+
+model User {
+  id     Int     @id @default(autoincrement())
+  name   String?
+  orders Order[]
+  Cart   Cart[]
+}
+
+enum Status {
+  DRAFT
+  PURCHASED
+  PAID
+  SENT
+  SHIPPED
+  DELETED
+}
+
+model Order {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  status    Status   @default(DRAFT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Cart {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  User       User?    @relation(fields: [userId], references: [id])
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  quantity   Int      @default(1)
+  totalPrice Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
