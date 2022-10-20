@@ -15,30 +15,46 @@ export class ProductsService {
     const { sortBy, order, searchBy, search } = findAllProductsDto;
 
     const query = {};
-    let whereClause = {};
+
     if (searchBy && search) {
-      whereClause = {
-        [searchBy]: {
-          contains: search,
-        },
+      query['where'] = {
+        AND: [
+          {
+            isDeleted: {
+              equals: false,
+            },
+          },
+          {
+            [searchBy]: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
       };
     } else if (search) {
-      whereClause: {
+      query['where'] = {
         OR: [
           {
             title: {
               contains: search,
+              mode: 'insensitive',
             },
           },
           {
-            description: {
+            title: {
               contains: search,
+              mode: 'insensitive',
             },
           },
-        ];
-      }
+        ],
+        AND: {
+          isDeleted: {
+            equals: false,
+          },
+        },
+      };
     }
-    query['where'] = whereClause;
 
     if (sortBy && order) {
       query['orderBy'] = {
@@ -50,13 +66,31 @@ export class ProductsService {
       };
     }
 
+    if (!Object.keys(query).length) {
+      query['where'] = {
+        isDeleted: false,
+      };
+      query['orderBy'] = { price: 'asc' };
+    }
+
     return this.prisma.product.findMany(query);
   }
 
   async findOne(id: number): Promise<Product> {
     return this.prisma.product.findFirst({
       where: {
-        id,
+        AND: [
+          {
+            id: {
+              equals: id,
+            },
+          },
+          {
+            isDeleted: {
+              equals: false,
+            },
+          },
+        ],
       },
     });
   }
@@ -66,14 +100,21 @@ export class ProductsService {
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
     return this.prisma.product.update({
-      where: { id },
+      where: {
+        id,
+      },
       data: updateProductDto,
     });
   }
 
   async remove(id: number): Promise<Product> {
-    return this.prisma.product.delete({
-      where: { id },
+    return this.prisma.product.update({
+      where: {
+        id,
+      },
+      data: {
+        isDeleted: true,
+      },
     });
   }
 }
