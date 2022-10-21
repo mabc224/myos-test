@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
+  productId   Int      @id @default(autoincrement())
   title       String   @db.VarChar(255)
   description String?  @db.Text
   picture     String?
@@ -20,15 +20,16 @@ model Product {
   quantity    Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  Cart        Cart[]
-  @@unique([id, isDeleted])
+  cart        Cart[]
+
+  @@unique([productId, isDeleted])
 }
 
 model User {
-  id     Int     @id @default(autoincrement())
+  userId Int     @id @default(autoincrement())
   name   String?
   orders Order[]
-  Cart   Cart[]
+  cart   Cart[]
 }
 
 enum Status {
@@ -41,22 +42,25 @@ enum Status {
 }
 
 model Order {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  status    Status   @default(DRAFT)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  orderId    Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [userId])
+  status     Status   @default(DRAFT)
+  totalPrice Float    @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  cart       Cart[]
 }
 
 model Cart {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  User       User?    @relation(fields: [userId], references: [id])
-  productId  Int
-  product    Product  @relation(fields: [productId], references: [id])
-  quantity   Int      @default(1)
-  totalPrice Float
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  cartId    Int      @id @default(autoincrement())
+  userId    Int
+  User      User?    @relation(fields: [userId], references: [userId])
+  productId Int
+  product   Product  @relation(fields: [productId], references: [productId])
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [orderId])
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
