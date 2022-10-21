@@ -13,6 +13,7 @@ RUN npm install
 COPY . .
 
 RUN npm run build
+#RUN npm run-script migrate:deploy
 
 FROM node:16
 
