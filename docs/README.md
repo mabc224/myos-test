@@ -20,11 +20,12 @@
 
 ### Option 3
 
-* Import `api-v1.yaml` into Postman as Open API collection
+* Import `api-v1.yaml` into Postman as *__OpenAPI__* .
 
   * set `API_URL` variable
   * Run the application
   * Test the calls
+  * *__Note:__ `eCommerece-Api-Env.postman_environment.json` can be imported to set environment variables in postman*
 
 ### Option 4
 
@@ -33,3 +34,4 @@
   * set `API_URL` variable
   * Run the application
   * Test the calls
+  * *__Note:__ `eCommerece-Api-Env.postman_environment.json` can be imported to set environment variables in postman*
