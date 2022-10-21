@@ -1,7 +1,9 @@
 {
 	"info": {
+		"_postman_id": "728767c0-f0e5-440c-ad76-b6cfdcbd6456",
 		"name": "eCommerece-Api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3633195"
 	},
 	"item": [
 		{
@@ -27,7 +29,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{API_URL}}/products?searchBy={{searchBy}}&search={{searchPhrase}}&sortBy={{sortBy}}&order={{order}}",
+					"raw": "{{API_URL}}/products?searchBy={{searchBy}}&search={{search}}&sortBy={{sortBy}}&order={{order}}",
 					"host": [
 						"{{API_URL}}"
 					],
@@ -41,7 +43,7 @@
 						},
 						{
 							"key": "search",
-							"value": "{{searchPhrase}}"
+							"value": "{{search}}"
 						},
 						{
 							"key": "sortBy",
@@ -74,7 +76,7 @@
 			"response": []
 		},
 		{
-			"name": "3 - Get Order by Id",
+			"name": "2.1 - Get Order by Id",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -92,7 +94,7 @@
 			"response": []
 		},
 		{
-			"name": "4 - Add product in Cart",
+			"name": "3 - Add product in Cart",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -120,13 +122,13 @@
 			"response": []
 		},
 		{
-			"name": "5 - Update product in Cart",
+			"name": "3.1 - Update product in Cart",
 			"request": {
 				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"productId\": 1,\r\n    \"quantity\": 5\r\n}",
+					"raw": "{\r\n    \"quantity\": 5\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -149,7 +151,7 @@
 			"response": []
 		},
 		{
-			"name": "6 - Delete product in Cart",
+			"name": "3.2 - Delete product in Cart",
 			"request": {
 				"method": "DELETE",
 				"header": [],
@@ -169,7 +171,7 @@
 			"response": []
 		},
 		{
-			"name": "7 - Purchase Order",
+			"name": "4 - Purchase Order",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -188,7 +190,7 @@
 			"response": []
 		},
 		{
-			"name": "8 - Pay Order",
+			"name": "5 - Pay Order",
 			"request": {
 				"method": "POST",
 				"header": [],
