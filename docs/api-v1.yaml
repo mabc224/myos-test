@@ -1,0 +1,185 @@
+openapi: 3.0.1
+info:
+  title: nestjs-eCommerece-rest-api
+  version: "1"
+  description: |
+    ## Welcome to the eCommerece API docs.
+
+    ### Importing into Postman as collection
+    While you can use this interface to make API calls against our API, feel free to [download](api-v1.yaml) the OpenAPI file (Yaml)
+    then import it into Postman (it will create a collection).
+  contact:
+    email: mabc224@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: http://localhost:4000/v1
+paths:
+  /products:
+    get:
+      tags:
+        - General
+      summary: 1.1 - Get Products (By search)
+      parameters:
+        - name: searchBy
+          in: query
+          schema:
+            type: string
+          example: 'title'
+        - name: search
+          in: query
+          schema:
+            type: string
+          example: 'pizza'
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+          example: 'price'
+        - name: order
+          in: query
+          schema:
+            type: string
+          example: 'asc'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /orders:
+    post:
+      tags:
+        - General
+      summary: 2 - Create Order
+      requestBody:
+        content: {}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /orders/{orderId}:
+    get:
+      tags:
+        - General
+      summary: 3 - Get Order by Id
+      parameters:
+        - name: orderId
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /orders/{orderId}/products:
+    post:
+      tags:
+        - General
+      summary: 4 - Add product in Cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                quantity: 1
+                productId: 1
+      parameters:
+        - name: orderId
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /orders/{orderId}/products/{cartId}:
+    put:
+      tags:
+        - General
+      summary: 5 - Update product in Cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                quantity: 5
+      parameters:
+        - name: orderId
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: cartId
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - General
+      summary: 6 - Delete product in Cart
+      parameters:
+        - name: orderId
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: cartId
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /orders/{orderId}/purchase:
+    post:
+      tags:
+        - General
+      summary: 7 - Purchase Order
+      requestBody:
+        content: {}
+      parameters:
+        - name: orderId
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /orders/{orderId}/pay:
+    post:
+      tags:
+        - General
+      summary: 8 - Pay Order
+      requestBody:
+        content: {}
+      parameters:
+        - name: orderId
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
