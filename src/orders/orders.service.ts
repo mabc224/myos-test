@@ -1,13 +1,20 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { AddProductDto, UpdateOrderDto } from './dto';
+import { AddProductDto } from './dto';
 import { PrismaService } from 'nestjs-prisma';
 import Constants, { OrderStatus } from './utils/constants';
 import { UpdateProductDto } from '../products/dto';
+import {
+  ApiCartItem,
+  ApiCartProductItem,
+  ApiOrder,
+  DbCart,
+  DbOrder,
+} from './entities/order.entity';
 
 @Injectable()
 export class OrdersService {
   constructor(private prisma: PrismaService) {}
-  async create(userId: number) {
+  async create(userId: number): Promise<DbOrder> {
     return this.prisma.order.create({ data: { userId } });
   }
 
@@ -15,7 +22,7 @@ export class OrdersService {
     userId: number,
     orderId: number,
     addProductDto: AddProductDto,
-  ) {
+  ): Promise<DbCart> {
     const order = await this.findActiveOrderForUser(userId);
     if (!order) {
       throw new HttpException(
@@ -39,9 +46,13 @@ export class OrdersService {
         HttpStatus.FORBIDDEN,
       );
     }
-    return this.prisma.cart.delete({
-      where: { id: cartId },
+    const aa = await this.prisma.cart.delete({
+      where: { cartId },
     });
+    console.log(aa);
+    // return this.prisma.cart.delete({
+    //   where: { cartId },
+    // });
   }
 
   async updateProduct(
@@ -49,7 +60,7 @@ export class OrdersService {
     orderId: number,
     cartId: number,
     updateProductDto: UpdateProductDto,
-  ) {
+  ): Promise<DbCart> {
     const order = await this.findActiveOrderForUser(userId);
     if (!order) {
       throw new HttpException(
@@ -57,8 +68,9 @@ export class OrdersService {
         HttpStatus.FORBIDDEN,
       );
     }
+
     return this.prisma.cart.update({
-      where: { id: cartId },
+      where: { cartId },
       data: updateProductDto,
     });
   }
@@ -72,15 +84,15 @@ export class OrdersService {
       );
     }
     const orderDetail = await this.getCart(orderId);
-    const { id, cart = [] } = orderDetail;
+    const { cart = [] } = orderDetail;
 
     const promises = [];
     cart.forEach((item) => {
       const { quantity, product } = item;
-      const { id } = product;
+      const { productId } = product;
       const query = this.prisma.product.update({
         where: {
-          id,
+          productId,
         },
         data: { quantity: { decrement: quantity } },
       });
@@ -88,7 +100,7 @@ export class OrdersService {
     });
     const updateOrderStatus = this.prisma.order.update({
       where: {
-        id: orderId,
+        orderId,
       },
       data: { status: Constants.OrderStatus.PURCHASED },
     });
@@ -111,7 +123,7 @@ export class OrdersService {
 
     return this.prisma.order.update({
       where: {
-        id: orderId,
+        orderId,
       },
       data: { status: OrderStatus.PAID },
     });
@@ -123,7 +135,7 @@ export class OrdersService {
 
   async reCalculateCart(order: any) {
     const orderDetail = { ...order };
-    const { id, cart = [] } = orderDetail;
+    const { orderId, cart = [] } = orderDetail;
     let cartTotalPrice = 0;
     cart.forEach((item) => {
       const { quantity, product } = item;
@@ -131,14 +143,13 @@ export class OrdersService {
       const totalPrice = Number(
         parseFloat(String(quantity * price)).toFixed(2),
       );
-      // product.totalPrice = totalPrice;
       cartTotalPrice += totalPrice;
     });
     order.totalPrice = cartTotalPrice;
 
     await this.prisma.order.update({
       where: {
-        id,
+        orderId,
       },
       data: { totalPrice: cartTotalPrice },
     });
@@ -149,7 +160,7 @@ export class OrdersService {
   async getCart(orderId: number) {
     return this.prisma.order.findUnique({
       where: {
-        id: orderId,
+        orderId,
       },
       include: {
         cart: {
@@ -190,32 +201,8 @@ export class OrdersService {
             },
           },
           {
-            id: {
+            orderId: {
               equals: orderId,
-            },
-          },
-        ],
-      },
-    });
-  }
-
-  async isActiveOrderForUser(userId: number, orderId: number) {
-    return this.prisma.order.findFirst({
-      where: {
-        AND: [
-          {
-            userId: {
-              equals: userId,
-            },
-          },
-          {
-            id: {
-              equals: orderId,
-            },
-          },
-          {
-            status: {
-              equals: Constants.OrderStatus.DRAFT,
             },
           },
         ],
@@ -265,27 +252,27 @@ export class OrdersService {
    ************          Db > API transforms          ************
    **************************************************************** */
 
-  getOrderFromDb(order: any) {
-    const { id, status, totalPrice, cart } = order;
+  getApiOrder(order: any): ApiOrder {
+    const { orderId, status, totalPrice, cart = [] } = order;
 
     return {
-      orderId: id,
+      orderId,
       status,
       totalPrice,
-      cart: cart.map((cartRow) => this.getCartFromDb(cartRow)),
+      cart: cart.map((cartRow) => this.getAPiCart(cartRow)),
     };
   }
 
-  getCartFromDb(cart: any) {
-    const { id, quantity, product } = cart;
-    const productRow = this.getProductFromDb(product);
-    return { cartId: id, quantity, ...productRow };
+  getAPiCart(cart: any): ApiCartItem {
+    const { cartId, quantity, product } = cart;
+    const productRow = this.getApiProduct(product);
+    return { cartId, quantity, ...productRow };
   }
 
-  getProductFromDb(product: any) {
-    const { id, title, description, picture, price } = product;
+  getApiProduct(product: any): ApiCartProductItem {
+    const { productId, title, description, picture, price } = product;
     return {
-      productId: id,
+      productId,
       title,
       description,
       picture,

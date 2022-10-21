@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { CreateProductDto, UpdateProductDto, FindAllProductsDto } from './dto';
-import { Product } from './entities/product.entity';
+import { DbProduct, ApiProduct } from './entities/product.entity';
 
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createProductDto: CreateProductDto): Promise<Product> {
+  async create(createProductDto: CreateProductDto): Promise<DbProduct> {
     return this.prisma.product.create({ data: createProductDto });
   }
 
-  async findAll(findAllProductsDto: FindAllProductsDto): Promise<Product[]> {
+  async findAll(findAllProductsDto: FindAllProductsDto): Promise<DbProduct[]> {
     const { sortBy, order, searchBy, search } = findAllProductsDto;
 
     const query = {};
@@ -76,13 +76,13 @@ export class ProductsService {
     return this.prisma.product.findMany(query);
   }
 
-  async findOne(id: number): Promise<Product> {
+  async findOne(productId: number): Promise<DbProduct> {
     return this.prisma.product.findFirst({
       where: {
         AND: [
           {
-            id: {
-              equals: id,
+            productId: {
+              equals: productId,
             },
           },
           {
@@ -96,25 +96,41 @@ export class ProductsService {
   }
 
   async update(
-    id: number,
+    productId: number,
     updateProductDto: UpdateProductDto,
-  ): Promise<Product> {
+  ): Promise<DbProduct> {
     return this.prisma.product.update({
       where: {
-        id,
+        productId,
       },
       data: updateProductDto,
     });
   }
 
-  async remove(id: number): Promise<Product> {
+  async remove(productId: number): Promise<DbProduct> {
     return this.prisma.product.update({
       where: {
-        id,
+        productId,
       },
       data: {
         isDeleted: true,
       },
     });
+  }
+
+  /** ***************************************************************
+   ************          Db > API transforms          ************
+   **************************************************************** */
+
+  getProductFromDb(product: any): ApiProduct {
+    const { productId, title, description, picture, price } = product;
+
+    return {
+      productId,
+      title,
+      description,
+      picture,
+      price,
+    };
   }
 }

@@ -13,9 +13,8 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { AddProductDto } from './dto';
+import { AddProductDto, UpdateProductDto } from './dto';
 import { AuthGuard, OrderGuard } from './../common/guards';
-import { UpdateProductDto } from '../products/dto';
 
 @Controller({ path: 'orders', version: ['1'] })
 @UseGuards(AuthGuard)
@@ -29,17 +28,18 @@ export class OrdersController {
       userId,
     );
     if (activeOrder) {
-      return response.status(HttpStatus.OK).send(activeOrder);
+      const orderRow = await this.ordersService.getApiOrder(activeOrder);
+      return response.status(HttpStatus.OK).send(orderRow);
     }
-    return this.ordersService.create(userId);
+    const orderRow = await this.ordersService.create(userId);
+    return this.ordersService.getApiOrder(orderRow);
   }
 
   @UseGuards(OrderGuard)
   @Get(':orderId')
   async findOne(@Param('orderId', ParseIntPipe) orderId: number) {
-    const cartRow = await this.ordersService.getCart(orderId);
-    console.log(cartRow);
-    return this.ordersService.getOrderFromDb(cartRow);
+    const orderRow = await this.ordersService.getCart(orderId);
+    return this.ordersService.getApiOrder(orderRow);
   }
 
   @UseGuards(OrderGuard)
@@ -52,8 +52,9 @@ export class OrdersController {
     const { userId } = request.user;
     await this.ordersService.addProduct(userId, orderId, addProductDto);
     const cartWithProducts = await this.ordersService.getCart(orderId);
-
-    return this.ordersService.reCalculateCart(cartWithProducts);
+    await this.ordersService.reCalculateCart(cartWithProducts);
+    const updatedCartRow = await this.ordersService.getCart(orderId);
+    return this.ordersService.getApiOrder(updatedCartRow);
   }
 
   @UseGuards(OrderGuard)
@@ -66,8 +67,9 @@ export class OrdersController {
     const { userId } = request.user;
     await this.ordersService.deleteProduct(userId, orderId, cartId);
     const cartWithProducts = await this.ordersService.getCart(orderId);
-
-    return this.ordersService.reCalculateCart(cartWithProducts);
+    await this.ordersService.reCalculateCart(cartWithProducts);
+    const updatedCartRow = await this.ordersService.getCart(orderId);
+    return this.ordersService.getApiOrder(updatedCartRow);
   }
 
   @UseGuards(OrderGuard)
@@ -86,8 +88,9 @@ export class OrdersController {
       updateProductDto,
     );
     const cartWithProducts = await this.ordersService.getCart(orderId);
-
-    return this.ordersService.reCalculateCart(cartWithProducts);
+    await this.ordersService.reCalculateCart(cartWithProducts);
+    const updatedCartRow = await this.ordersService.getCart(orderId);
+    return this.ordersService.getApiOrder(updatedCartRow);
   }
 
   @UseGuards(OrderGuard)
@@ -98,7 +101,8 @@ export class OrdersController {
   ) {
     const { userId } = request.user;
     await this.ordersService.purchaseOrder(userId, orderId);
-    return this.ordersService.getCart(orderId);
+    const cartWithProducts = await this.ordersService.getCart(orderId);
+    return this.ordersService.getApiOrder(cartWithProducts);
   }
 
   @UseGuards(OrderGuard)
@@ -109,7 +113,8 @@ export class OrdersController {
   ) {
     const { userId } = request.user;
     await this.ordersService.payOrder(userId, orderId);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    return this.ordersService.getCart(orderId);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const cartWithProducts = await this.ordersService.getCart(orderId);
+    return this.ordersService.getApiOrder(cartWithProducts);
   }
 }
