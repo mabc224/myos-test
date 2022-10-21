@@ -4,7 +4,7 @@
 
 ### Option 1
 
-* Copy the file
+* Copy the file `api-v1.yaml`
 * Go to [Swagger editor](https://editor.swagger.io/)
 * Paste the contents
 
@@ -20,10 +20,16 @@
 
 ### Option 3
 
-* Import into Postman as Open API collection
+* Import `api-v1.yaml` into Postman as Open API collection
 
+  * set `API_URL` variable
+  * Run the application
+  * Test the calls
 
+### Option 4
 
-* set `API_URL` variable
-* Run the application
-* Test the calls
+* Import `eCommerece-Api.postman_collection.json` into Postman as file
+
+  * set `API_URL` variable
+  * Run the application
+  * Test the calls

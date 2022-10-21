@@ -1,9 +1,9 @@
 openapi: 3.0.1
 info:
-  title: nestjs-eCommerece-rest-api
+  title: nestjs-eCommerce-rest-api
   version: "1"
   description: |
-    ## Welcome to the eCommerece API docs.
+    ## Welcome to the eCommerce API docs.
 
     ### Importing into Postman as collection
     While you can use this interface to make API calls against our API, feel free to [download](api-v1.yaml) the OpenAPI file (Yaml)
@@ -20,7 +20,7 @@ paths:
     get:
       tags:
         - General
-      summary: 1.1 - Get Products (By search)
+      summary: 1 - Get Products (By search)
       parameters:
         - name: searchBy
           in: query
@@ -63,7 +63,7 @@ paths:
     get:
       tags:
         - General
-      summary: 3 - Get Order by Id
+      summary: 2.1 - Get Order by Id
       parameters:
         - name: orderId
           in: path
@@ -79,7 +79,7 @@ paths:
     post:
       tags:
         - General
-      summary: 4 - Add product in Cart
+      summary: 3 - Add product in Cart
       requestBody:
         content:
           application/json:
@@ -103,7 +103,7 @@ paths:
     put:
       tags:
         - General
-      summary: 5 - Update product in Cart
+      summary: 3.1 - Update product in Cart
       requestBody:
         content:
           application/json:
@@ -130,7 +130,7 @@ paths:
     delete:
       tags:
         - General
-      summary: 6 - Delete product in Cart
+      summary: 3.2 - Delete product in Cart
       parameters:
         - name: orderId
           in: path
@@ -151,7 +151,7 @@ paths:
     post:
       tags:
         - General
-      summary: 7 - Purchase Order
+      summary: 4 - Purchase Order
       requestBody:
         content: {}
       parameters:
@@ -169,7 +169,7 @@ paths:
     post:
       tags:
         - General
-      summary: 8 - Pay Order
+      summary: 5 - Pay Order
       requestBody:
         content: {}
       parameters:

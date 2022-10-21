@@ -1,20 +1,22 @@
-## eCommerece APi
+# eCommerce APi
 
 ## Description
 
 Online shop API with the following features:
 - Product API:
-  - API to list all the products with
-  - search: by title and description
-  - sort: by price
+  - API to list all the products with      - Step 1
+    - search: by title and description     - Step 1.1
+    - sort: by price                       - Step 1.1
 
 - Checkout API:
-  - API to create an order
-    - API to view single order
-  - API to add product in order
-  - API to update/delete product in order
-  - API to purchase order
-  - API to pay order
+  - API to create an order                 - Step 2
+    - API to view single order             - Step 2.1
+  - API to add product in order            - Step 3
+  - API to update/delete product in order  - Step 3.1
+  - API to purchase order                  - Step 4
+  - API to pay order                       - Step 5
+
+![Image](docs/api-summary.png "Postman Image")
 
 ### Built With
 
@@ -40,7 +42,7 @@ Here is what you need to be able to run Cal.
 
 ### Setup
 
-1. Clone the repo into a public GitHub repository (or fork https://github.com/calcom/cal.com/fork). If you plan to distribute the code, keep the source code public to comply with [AGPLv3](https://github.com/calcom/cal.com/blob/main/LICENSE). To clone in a private repository, [acquire a commercial license](https://cal.com/sales))
+1. Clone the repo
 
    ```sh
    git clone https://github.com/mabc224/myos-test.git
@@ -80,13 +82,17 @@ Here is what you need to be able to run Cal.
     # watch mode
     $ yarn start:dev
     ```
+   
+7. Visit `localhost:<port>/v1/products` in your browser.
+
 
 ## API Documentation
 
 Import open api docs into postman as collection.
 
 ```shell
-  docs/api-v1.yaml
+  docs/api-v1.yaml (For Swagger)
+  docs/eCommerece-Api.postman_collection.json (For Postman)
 ```
 
 ## Stay in touch
