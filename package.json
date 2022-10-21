@@ -25,7 +25,7 @@
     "prisma:generate": "npx prisma generate",
     "prisma:studio": "npx prisma studio",
     "prisma:seed": "npx prisma db seed",
-    "prisma:reset": "npx prisma migrate reset --skip-seed"
+    "prisma:reset": "npx prisma migrate reset"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
