@@ -33,6 +33,17 @@ export class OrdersService {
 
     const { productId, quantity } = addProductDto;
 
+    const productRow = await this.prisma.product.findFirst({
+      where: { productId },
+    });
+
+    if (productRow.quantity < quantity) {
+      throw new HttpException(
+        'Required quantity of the product is not available',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
     return this.prisma.cart.create({
       data: { orderId, userId, productId, quantity },
     });
