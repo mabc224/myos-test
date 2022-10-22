@@ -1,20 +1,21 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Put,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
+  Get,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
   Req,
   Res,
-  HttpStatus,
-  ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { AddProductDto, UpdateProductDto } from './dto';
 import { AuthGuard, OrderGuard } from './../common/guards';
+import { OrderStatus } from './utils/constants';
 
 @Controller({ path: 'orders', version: ['1'] })
 @UseGuards(AuthGuard)
@@ -24,8 +25,9 @@ export class OrdersController {
   @Post()
   async create(@Req() request, @Res({ passthrough: true }) response) {
     const { userId } = request.user;
-    const activeOrder = await this.ordersService.findUserWithActiveOrder(
+    const activeOrder = await this.ordersService.findOrderForUserWithStatus(
       userId,
+      OrderStatus.DRAFT,
     );
     if (activeOrder) {
       const orderRow = await this.ordersService.getApiOrder(activeOrder);
