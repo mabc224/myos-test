@@ -23,7 +23,10 @@ export class OrdersService {
     orderId: number,
     addProductDto: AddProductDto,
   ): Promise<DbCart> {
-    const order = await this.findActiveOrderForUser(userId);
+    const order = await this.findOrderForUserWithStatus(
+      userId,
+      OrderStatus.DRAFT,
+    );
     if (!order) {
       throw new HttpException(
         'User does not have active order',
@@ -50,20 +53,20 @@ export class OrdersService {
   }
 
   async deleteProduct(userId: number, orderId: number, cartId: number) {
-    const order = await this.findActiveOrderForUser(userId);
+    const order = await this.findOrderForUserWithStatus(
+      userId,
+      OrderStatus.DRAFT,
+    );
     if (!order) {
       throw new HttpException(
         'User does not have active order',
         HttpStatus.FORBIDDEN,
       );
     }
-    const aa = await this.prisma.cart.delete({
+
+    return this.prisma.cart.delete({
       where: { cartId },
     });
-    console.log(aa);
-    // return this.prisma.cart.delete({
-    //   where: { cartId },
-    // });
   }
 
   async updateProduct(
@@ -72,11 +75,29 @@ export class OrdersService {
     cartId: number,
     updateProductDto: UpdateProductDto,
   ): Promise<DbCart> {
-    const order = await this.findActiveOrderForUser(userId);
+    const order = await this.findOrderForUserWithStatus(
+      userId,
+      OrderStatus.DRAFT,
+    );
     if (!order) {
       throw new HttpException(
         'User does not have active order',
         HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const cartRow = await this.prisma.cart.findFirst({
+      where: { cartId },
+    });
+
+    const productRow = await this.prisma.product.findFirst({
+      where: { productId: cartRow.productId },
+    });
+
+    if (productRow.quantity < updateProductDto.quantity) {
+      throw new HttpException(
+        'Required quantity of the product is not available',
+        HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
@@ -87,7 +108,10 @@ export class OrdersService {
   }
 
   async purchaseOrder(userId: number, orderId: number) {
-    const order = await this.findActiveOrderForUser(userId);
+    const order = await this.findOrderForUserWithStatus(
+      userId,
+      OrderStatus.DRAFT,
+    );
     if (!order) {
       throw new HttpException(
         'User does not have active order',
@@ -183,25 +207,6 @@ export class OrdersService {
     });
   }
 
-  async findUserWithActiveOrder(userId: number) {
-    return this.prisma.order.findFirst({
-      where: {
-        AND: [
-          {
-            userId: {
-              equals: userId,
-            },
-          },
-          {
-            status: {
-              equals: Constants.OrderStatus.DRAFT,
-            },
-          },
-        ],
-      },
-    });
-  }
-
   async isOrderBelongToCurrentUser(userId: number, orderId: number) {
     return this.prisma.order.findFirst({
       where: {
@@ -214,25 +219,6 @@ export class OrdersService {
           {
             orderId: {
               equals: orderId,
-            },
-          },
-        ],
-      },
-    });
-  }
-
-  async findActiveOrderForUser(userId: number) {
-    return this.prisma.order.findFirst({
-      where: {
-        AND: [
-          {
-            userId: {
-              equals: userId,
-            },
-          },
-          {
-            status: {
-              equals: Constants.OrderStatus.DRAFT,
             },
           },
         ],
